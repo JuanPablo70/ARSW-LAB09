@@ -15,7 +15,7 @@ Cuando un conjunto de usuarios consulta un enésimo número (superior a 1000000)
 
 ### Parte 1 - Escalabilidad vertical
 
-1. Diríjase a el [Portal de Azure](https://portal.azure.com/) y a continuación cree una maquina virtual con las características básicas descritas en la imágen 1 y que corresponden a las siguientes:
+1. Diríjase al [Portal de Azure](https://portal.azure.com/) y a continuación cree una maquina virtual con las características básicas descritas en la imágen 1 y que corresponden a las siguientes:
     * Resource Group = SCALABILITY_LAB
     * Virtual machine name = VERTICAL-SCALABILITY
     * Image = Ubuntu Server 
@@ -28,6 +28,8 @@ Cuando un conjunto de usuarios consulta un enésimo número (superior a 1000000)
 2. Para conectarse a la VM use el siguiente comando, donde las `x` las debe remplazar por la IP de su propia VM (Revise la sección "Connect" de la virtual machine creada para tener una guía más detallada).
 
     `ssh scalability_lab@xxx.xxx.xxx.xxx`
+
+   ![](img/escalabilityVertical2.png)
 
 3. Instale node, para ello siga la sección *Installing Node.js and npm using NVM* que encontrará en este [enlace](https://linuxize.com/post/how-to-install-node-js-on-ubuntu-18.04/).
 4. Para instalar la aplicación adjunta al Laboratorio, suba la carpeta `FibonacciApp` a un repositorio al cual tenga acceso y ejecute estos comandos dentro de la VM:
@@ -44,7 +46,9 @@ Cuando un conjunto de usuarios consulta un enésimo número (superior a 1000000)
 
 6. Antes de verificar si el endpoint funciona, en Azure vaya a la sección de *Networking* y cree una *Inbound port rule* tal como se muestra en la imágen. Para verificar que la aplicación funciona, use un browser y user el endpoint `http://xxx.xxx.xxx.xxx:3000/fibonacci/6`. La respuesta debe ser `The answer is 8`.
 
-![](images/part1/part1-vm-3000InboudRule.png)
+   ![](images/part1/part1-vm-3000InboudRule.png)
+
+   ![](img/escalabilidadVertical66.png)
 
 7. La función que calcula en enésimo número de la secuencia de Fibonacci está muy mal construido y consume bastante CPU para obtener la respuesta. Usando la consola del Browser documente los tiempos de respuesta para dicho endpoint usando los siguintes valores:
     * 1000000
@@ -84,17 +88,78 @@ Cuando un conjunto de usuarios consulta un enésimo número (superior a 1000000)
 **Preguntas**
 
 1. ¿Cuántos y cuáles recursos crea Azure junto con la VM?
+
+   Se generan tres recursos. Public IP Address, Resource Group, SSH key, Network Security Group, Virtual Network, Network Interface y Disk.
+
+   ![](img/recursos.png)
+
 2. ¿Brevemente describa para qué sirve cada recurso?
+
+   + **Public IP Address**: se utiliza para permitir que los recursos de Azure como un VM, sean accesibles desde internet.
+
+   + **Resource Group**: es un contenedor lógico que se utiliza para organizar y administrar los recursos de Azure relacionados en una sola unidad.
+
+   + **SSH Key**: una SSH key o clave SSH es un recurso que se utiliza para autenticar el acceso a una máquina virtual (VM) mediante el protocolo SSH (Secure Shell).
+   
+   + **Network Security Group**: un grupo de seguridad de red (network security group o NSG) es un recurso que se utiliza para filtrar el tráfico de red que ingresa o sale de una red virtual en Azure.
+   
+   + **Virtual Network**: una red virtual (virtual network o VNet) es un recurso que se utiliza para crear una red privada virtual en la nube de Azure.
+   
+   + **Network Interface**: una interfaz de red (Network Interface o NIC) es un recurso que se utiliza para conectar una máquina virtual (VM) a una red virtual en Azure.
+   
+   + **Disk**: un disco (Disk) es un recurso que se utiliza para almacenar los datos y el sistema operativo de una máquina virtual (VM).
+
 3. ¿Al cerrar la conexión ssh con la VM, por qué se cae la aplicación que ejecutamos con el comando `npm FibonacciApp.js`? ¿Por qué debemos crear un *Inbound port rule* antes de acceder al servicio?
+
+   Cuando se cierra la conexión SSH con una máquina virtual (VM) de forma abrupta, la sesión SSH se termina y todos los procesos que se ejecutaban en la sesión también se detienen. Se debe crear un Inbound port rule para poder acceder al recurso por el puerto 3000.
+
 4. Adjunte tabla de tiempos e interprete por qué la función tarda tando tiempo.
+
+   + 1000000 - 16s
+   + 1010000 - 17.23s
+   + 1020000 - 18.21s
+   + 1030000 - 17.82s
+   + 1040000 - 18.34s
+   + 1050000 - 18.60s
+   + 1060000 - 23.69s
+   + 1070000 - 19.51s
+   + 1080000 - 19.89s
+   + 1090000 - 20.24s
+   
+   La función tarda mucho, ya que la función no está bien construida y la VM no tiene muchos recursos.
+
 5. Adjunte imágen del consumo de CPU de la VM e interprete por qué la función consume esa cantidad de CPU.
+
+   ![](img/escalabilidadVertical8.png)
+
+   La función consume esta cantidad porque el tamaño de la VM es de 0.5 GiB de memoria.
+
 6. Adjunte la imagen del resumen de la ejecución de Postman. Interprete:
     * Tiempos de ejecución de cada petición.
+      ![](img/escalabilidadVertical9.png)
     * Si hubo fallos documentelos y explique.
+      No hubo fallos.
+
 7. ¿Cuál es la diferencia entre los tamaños `B2ms` y `B1ls` (no solo busque especificaciones de infraestructura)?
+
+   ![](img/tamaños.png)
+
 8. ¿Aumentar el tamaño de la VM es una buena solución en este escenario?, ¿Qué pasa con la FibonacciApp cuando cambiamos el tamaño de la VM?
+
+   En este escenario no es buena solución aumentar el tamaño de la VM, ya que la función no está bien construida. El consumo de la CPU presenta mejoría, pero el tiempo de respuesta no varía significativamente.
+
+   ![](img/escalabilidadVertical11.png)
+
+   ![](img/escalabilidadVertical12.png)
+
 9. ¿Qué pasa con la infraestructura cuando cambia el tamaño de la VM? ¿Qué efectos negativos implica?
+
+   Al cambiar el tamaño de B1ls a B2ms, el impacto más significativo es el precio, ya que si el tamaño es B1ls el precio es de 3.80 US$ mientras que B2ms el precio es de 60.74 US$.
+   
 10. ¿Hubo mejora en el consumo de CPU o en los tiempos de respuesta? Si/No ¿Por qué?
+
+   En el consumo de CPU si hubo una mejora porque la VM tiene más recursos, pero en tiempo de respuesta no porque la aplicación no es óptima.
+
 11. Aumente la cantidad de ejecuciones paralelas del comando de postman a `4`. ¿El comportamiento del sistema es porcentualmente mejor?
 
 ### Parte 2 - Escalabilidad horizontal
