@@ -329,10 +329,10 @@ El propósito del Network Security Group (NSG) es proporcionar una capa adiciona
 
 * Informe de newman 1 (Punto 2)
 
-![](./img/deployment.png)
+
 
 * Presente el Diagrama de Despliegue de la solución.
 
-
+![](./img/deployment.png)
 
 
